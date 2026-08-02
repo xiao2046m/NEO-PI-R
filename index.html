@@ -131,7 +131,7 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvet
 
 <script>
 (function(){
-  // ========== 完整 240 题 ==========
+  // ======================== 完整 240 题 ========================
   const raw = `我经常做白日梦，想象各种可能性。|O|幻想|0
 我喜欢沉浸在幻想和想象中。|O|幻想|0
 我很少做白日梦。|O|幻想|1
@@ -484,64 +484,282 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvet
     document.getElementById('summary').innerHTML=h;
   }
 
+  // ======================== 动态匹配模块 ========================
+  function getLevel(score) {
+    if (score < 20) return 'extreme_low';
+    if (score <= 39) return 'low';
+    if (score <= 69) return 'mid';
+    if (score <= 85) return 'high';
+    return 'extreme_high';
+  }
+
+  const matchLibrary = {
+    partner: {
+      positive: {
+        O: {
+          extreme_low: '极度务实保守，偏爱稳定可预测的生活节奏',
+          low: '倾向于传统和熟悉的方式，给你可靠的安全感',
+          mid: '对新事物保持适度好奇，既不过于冒险也不固步自封',
+          high: '乐于探索未知，能陪你一起尝试新鲜有趣的体验',
+          extreme_high: '充满天马行空的想象力，不断为你打开新世界的大门'
+        },
+        C: {
+          extreme_low: '随性自由不喜约束，让生活充满弹性与意外惊喜',
+          low: '做事灵活变通，能包容你偶尔的拖延和计划变动',
+          mid: '在秩序与松弛间取得平衡，与你共同维持舒适的生活节奏',
+          high: '自律可靠、善于规划，帮你把日子安排得井井有条',
+          extreme_high: '极度严谨负责，是你最坚实的后盾和生活管理者'
+        },
+        E: {
+          extreme_low: '极度内向喜独处，与你共享不被打扰的宁静时光',
+          low: '偏爱安静的小圈子，理解并尊重你对个人空间的需要',
+          mid: '社交能量与你相仿，一起外出或宅家都自然合拍',
+          high: '热情开朗，能带动气氛，让你在社交中感到轻松',
+          extreme_high: '精力充沛的社交中心，为你拓展丰富的人脉与活动'
+        },
+        A: {
+          extreme_low: '直率犀利不迎合，用最真实的方式与你交锋和成长',
+          low: '坦诚直接，不拐弯抹角，减少关系中不必要的猜疑',
+          mid: '温和而保有主见，既能体贴又能理性沟通分歧',
+          high: '同理心强、善于包容，让你敢于展现最脆弱的一面',
+          extreme_high: '极度善良无私，总把你的需求放在第一位'
+        },
+        N: {
+          extreme_low: '情绪极其稳定，像一座山给你持久的安宁',
+          low: '心态平和，能在你焦虑时提供冷静的安慰',
+          mid: '情绪反应与你相近，彼此懂得对方的心情起伏',
+          high: '敏感细腻，能深度共情你的每一丝情绪波动',
+          extreme_high: '情绪体验强烈，与你共同感受生命的每一份浓烈'
+        }
+      },
+      negative: {
+        O: {
+          extreme_low: '极度抗拒变化，任何新尝试都会引发冲突',
+          low: '过于保守固执，无法理解你对探索和成长的渴望',
+          mid: '对新观念不冷不热，精神交流停滞不前',
+          high: '过分追求刺激而不顾责任，让你缺乏安全感',
+          extreme_high: '想法离奇脱离现实，使关系充满不确定性'
+        },
+        C: {
+          extreme_low: '完全散漫无序，生活混乱且从不承担责任',
+          low: '缺乏计划性，拖延拖累你的安排，让你操心',
+          mid: '时而粗心大意，重要事情上难以托付',
+          high: '刻板僵化要求苛刻，把家变成规则监狱',
+          extreme_high: '强迫症般控制一切，完全不给弹性空间'
+        },
+        E: {
+          extreme_low: '自我封闭拒绝交流，情感连接几乎为零',
+          low: '过分孤僻，连必要的社交都回避，让你孤立无援',
+          mid: '社交需求错位，经常一方渴望陪伴一方想要独处',
+          high: '过于喧闹黏人，侵占你的私人时间与空间',
+          extreme_high: '无法忍受片刻安静，让你精疲力竭'
+        },
+        A: {
+          extreme_low: '冷漠挑剔好争辩，常常言语伤人而不自知',
+          low: '缺乏同情心，在你需要支持时显得漠不关心',
+          mid: '表面友好实则自私，关键时刻只考虑自己',
+          high: '过度讨好失去自我，让你感到关系不真实',
+          extreme_high: '毫无原则的老好人，在外受欺却拉你一起承担'
+        },
+        N: {
+          extreme_low: '情感麻木无法共情，你的痛苦在他看来毫无意义',
+          low: '过于冷静甚至冷血，无法给予情感慰藉',
+          mid: '情绪钝感，很难理解你的敏感和焦虑',
+          high: '情绪波动大，反复无常让你如履薄冰',
+          extreme_high: '极度神经质，间歇性崩溃耗尽你的能量'
+        }
+      }
+    },
+    colleague: {
+      positive: {
+        O: {
+          extreme_low: '坚守成熟流程，确保团队稳定输出',
+          low: '务实落地，专注执行已验证的方法减少风险',
+          mid: '接受合理化改进，但保持必要的谨慎',
+          high: '积极引入新思路，帮助团队打破瓶颈',
+          extreme_high: '创意源泉，持续驱动变革与突破'
+        },
+        C: {
+          extreme_low: '灵活机动，能快速应对突发变化',
+          low: '擅长多任务并行，不被条框束缚',
+          mid: '在计划与应变间游刃有余',
+          high: '严谨细致，交付质量值得高度信赖',
+          extreme_high: '项目管理大师，复杂事务安排得滴水不漏'
+        },
+        E: {
+          extreme_low: '专注深度工作，产出扎实的分析和方案',
+          low: '独立思考，不依赖频繁沟通也能高效产出',
+          mid: '沟通频率适中，团队协作顺畅不费劲',
+          high: '擅长对外联络，为团队争取资源和曝光',
+          extreme_high: '天生的团队粘合剂，推动跨部门合作'
+        },
+        A: {
+          extreme_low: '直言不讳，能尖锐指出问题推动改进',
+          low: '就事论事，不把个人情感带入工作',
+          mid: '友善协作，竞争时也保持公平',
+          high: '乐于助人，主动分担团队压力',
+          extreme_high: '无私奉献，始终把集体目标置于个人之上'
+        },
+        N: {
+          extreme_low: '压力越大表现越稳，是中流砥柱',
+          low: '情绪稳定，在危机时刻提供可靠支持',
+          mid: '合理应对压力，不传递焦虑情绪',
+          high: '对潜在风险敏感，帮助团队提前规避',
+          extreme_high: '极度警觉，能发现每个人忽略的隐患'
+        }
+      },
+      negative: {
+        O: {
+          extreme_low: '拒绝任何创新，成为团队进步的阻碍',
+          low: '固守陈规，对改进方案总是消极抵制',
+          mid: '对新工具新方法学习迟缓，拖慢效率',
+          high: '天马行空不切实际，浪费团队资源',
+          extreme_high: '想法朝令夕改，让团队疲于奔命'
+        },
+        C: {
+          extreme_low: '毫无责任心，承诺的事从未按时交付',
+          low: '粗心大意经常出错，需他人反复检查',
+          mid: '时而拖延，影响整体进度',
+          high: '过分纠结细节，导致项目无法推进',
+          extreme_high: '完美主义病态，把简单任务复杂化'
+        },
+        E: {
+          extreme_low: '信息黑洞不共享，阻碍团队协作',
+          low: '回避沟通，关键问题得不到及时解决',
+          mid: '开会沉默或过度发言，合作效率低下',
+          high: '话多而无重点，会议冗长低效',
+          extreme_high: '过度社交干扰工作，办公室政治源头'
+        },
+        A: {
+          extreme_low: '好斗爱争，把同事当敌人处处为难',
+          low: '自私自利，遇到困难首先推卸责任',
+          mid: '表面合作私下拆台，破坏团队信任',
+          high: '不懂拒绝揽活过多，反成团队短板',
+          extreme_high: '牺牲团队利益换取个人好人缘'
+        },
+        N: {
+          extreme_low: '对危机毫无反应，麻木漠视风险',
+          low: '过于钝感，无法察觉团队情绪变化',
+          mid: '偶尔情绪化，影响周围同事的状态',
+          high: '容易焦虑抱怨，破坏团队士气',
+          extreme_high: '情绪崩溃专业户，不断消耗他人能量'
+        }
+      }
+    },
+    friend: {
+      positive: {
+        O: {
+          extreme_low: '珍惜老朋友和传统，给你长久安稳的陪伴',
+          low: '偏爱熟悉圈子和日常，在一起永远舒适自在',
+          mid: '愿意一起尝试新活动，但也不排斥宅家看电影',
+          high: '好奇心强，总能拉你探索有趣的小众爱好',
+          extreme_high: '永远不缺新点子，每次见面都有意外惊喜'
+        },
+        C: {
+          extreme_low: '随遇而安，临时起意也能玩得尽兴',
+          low: '不讲究计划，和你来一场说走就走的旅行',
+          mid: '靠谱且灵活，聚会守约又不介意偶尔变卦',
+          high: '说到做到，是你最值得信赖的约定伙伴',
+          extreme_high: '每次都会提前安排好一切，你只需享受'
+        },
+        E: {
+          extreme_low: '享受两人安静的深谈，无需多余社交',
+          low: '理解你的独处需求，联系少但感情不减',
+          mid: '既能一起疯也能一起宅，节奏完美同步',
+          high: '开朗活泼，带你认识更多有趣的朋友',
+          extreme_high: '社交达人，但也会为你保留专属时光'
+        },
+        A: {
+          extreme_low: '毒舌但真心，能把你从自我欺骗中骂醒',
+          low: '直接不虚伪，不会在背后说三道四',
+          mid: '友善而有原则，不会为了讨好而撒谎',
+          high: '暖心体贴，总能察觉到你的情绪低落',
+          extreme_high: '无条件支持你，哪怕全世界都在反对'
+        },
+        N: {
+          extreme_low: '永远淡定从容，是你慌乱时最安心的存在',
+          low: '情绪稳定，不会给你增加额外的心理负担',
+          mid: '偶尔一起吐槽抱怨，互相减压',
+          high: '能敏锐捕捉你的情绪，陪你一起哭一起笑',
+          extreme_high: '与你深度共情，彼此是对方最安全的树洞'
+        }
+      },
+      negative: {
+        O: {
+          extreme_low: '固执刻板，嘲笑你的任何新尝试',
+          low: '生活单调乏味，和他一起只剩下怀旧',
+          mid: '对新事物兴趣缺缺，圈子越来越窄',
+          high: '玩心太重不顾后果，总拉你去冒险',
+          extreme_high: '想法瞬息万变，让你跟不上节奏'
+        },
+        C: {
+          extreme_low: '经常放鸽子，你的时间在他眼里一文不值',
+          low: '毫无计划，约好的事最后一刻才取消',
+          mid: '小事常忘，重要日子也会疏忽',
+          high: '过分较真，连玩游戏都要列规则清单',
+          extreme_high: '控制狂，连你的空闲时间都要规划'
+        },
+        E: {
+          extreme_low: '彻底宅，拒绝一切外出邀请，渐行渐远',
+          low: '不愿社交，让你的朋友圈子越来越小',
+          mid: '忽冷忽热，不知道什么时候会消失',
+          high: '整天组局，让你疲于应付',
+          extreme_high: '无法独处，需要你时刻陪伴'
+        },
+        A: {
+          extreme_low: '刻薄挖苦，用毒舌伤害你却不自知',
+          low: '很少真正关心你的感受，聊天总围绕自己',
+          mid: '偶尔背后议论，让你不敢完全信任',
+          high: '过度迎合讨好，让你觉得关系虚伪',
+          extreme_high: '没有原则的附和，在你犯错时也不会提醒'
+        },
+        N: {
+          extreme_low: '完全无法理解你的情绪，冷得像机器人',
+          low: '在你难过时只会给无效建议，毫无安慰',
+          mid: '偶尔负能量爆棚，把你当情绪垃圾桶',
+          high: '总是需要你的安慰，却很少给予回报',
+          extreme_high: '极度情绪化，一点小事就能引爆友谊'
+        }
+      }
+    }
+  };
+
   function renderMatches(pct) {
-    const E = pct.E, A = pct.A, N = pct.N, O = pct.O;
-    const isIntrovert = E <= 45, isAgreeable = A >= 65, isStable = N <= 40, isOpen = O >= 65;
+    const dimensions = ['O', 'C', 'E', 'A', 'N'];
+    const levels = {};
+    dimensions.forEach(d => { levels[d] = getLevel(pct[d]); });
 
-    const partnerSuitable = [
-      "包容你的想法，欣赏你原本的样子，不强迫你改变。",
-      "做事踏实不苛刻，对生活有要求但不对你吹毛求疵。",
-      isIntrovert ? "偏爱安静相处，能和你享受不说话也不尴尬的时光。" : "既能陪你热闹社交，也尊重你需要独处的时刻。",
-      "遇事好好沟通，不冷战、不指责，愿意和你共同面对分歧。"
-    ];
-    const partnerUnsuitable = [
-      "否定你的追求与价值观，让你时常自我怀疑。",
-      "事事挑剔，放大你的缺点，很少给予肯定和鼓励。",
-      isIntrovert ? "总拉你参加各种应酬，不理解你需要独处充电。" : "过分黏人控制，不给你独立社交的空间。",
-      isStable ? "小事就情绪化，让你在关系中总是小心翼翼。" : "情绪大起大落，不断消耗你的心理能量。"
-    ];
+    function buildPositiveText(scene) {
+      const lib = matchLibrary[scene].positive;
+      return dimensions.map(d => lib[d][levels[d]]).join('。') + '。';
+    }
+    function buildNegativeText(scene) {
+      const lib = matchLibrary[scene].negative;
+      return dimensions.map(d => lib[d][levels[d]]).join('。') + '。';
+    }
 
-    const colleagueSuitable = [
-      "守时靠谱，承诺的事情会认真推进，很少临时掉链子。",
-      "愿意尝试新方案，不固守旧方法，和你一起寻找更优解。",
-      isOpen ? "理性沟通分歧，就事论事，不把意见不同升级为个人矛盾。" : "能欣赏你的创新想法，同时帮你把好细节关。",
-      "责任心强，遇到问题主动补位，不逃避共同责任。"
-    ];
-    const colleagueUnsuitable = [
-      "拖延甩锅，把任务和责任都推给你，缺乏团队意识。",
-      "抗拒变通，坚持低效流程，不愿优化工作方式。",
-      "遇事只会抱怨，传播焦虑却不解决问题。",
-      "小团体意识重，把精力花在内耗上而非做事。"
-    ];
-
-    const friendSuitable = [
-      "理解你的独处需求，不会因为你没及时回复而生气。",
-      "尊重你的爱好和选择，即便不懂也愿意听你分享。",
-      "很少传递负能量，在一起时更多是相互支持而非倾倒情绪垃圾。",
-      isAgreeable ? "心地善良，从不背后议论，让你敢于展现脆弱。" : "坦诚直率，相处不必伪装，彼此都能做自己。"
-    ];
-    const friendUnsuitable = [
-      "总想黏着你，缺乏边界感，让你感到私人空间被侵犯。",
-      "调侃你的目标与梦想，用开玩笑的方式打击你的热情。",
-      "满是负面牢骚，每次见面都像在吸走你的能量。",
-      "把你的秘密当谈资，辜负你的信任。"
-    ];
+    const partnerSuitable = buildPositiveText('partner');
+    const partnerUnsuitable = buildNegativeText('partner');
+    const colleagueSuitable = buildPositiveText('colleague');
+    const colleagueUnsuitable = buildNegativeText('colleague');
+    const friendSuitable = buildPositiveText('friend');
+    const friendUnsuitable = buildNegativeText('friend');
 
     const sectionsHTML = `
       <div class="match-section">
         <h4>💑 理想伴侣</h4>
-        <p><span class="label suitable">合适</span><br>· ${partnerSuitable.join('<br>· ')}</p>
-        <p style="margin-top:10px;"><span class="label unsuitable">不合适</span><br>· ${partnerUnsuitable.join('<br>· ')}</p>
+        <p><span class="label suitable">合适</span><br>${partnerSuitable}</p>
+        <p style="margin-top:10px;"><span class="label unsuitable">不合适</span><br>${partnerUnsuitable}</p>
       </div>
       <div class="match-section">
         <h4>🤝 最佳搭档 / 同事</h4>
-        <p><span class="label suitable">合适</span><br>· ${colleagueSuitable.join('<br>· ')}</p>
-        <p style="margin-top:10px;"><span class="label unsuitable">不合适</span><br>· ${colleagueUnsuitable.join('<br>· ')}</p>
+        <p><span class="label suitable">合适</span><br>${colleagueSuitable}</p>
+        <p style="margin-top:10px;"><span class="label unsuitable">不合适</span><br>${colleagueUnsuitable}</p>
       </div>
       <div class="match-section">
         <h4>🎉 知己好友</h4>
-        <p><span class="label suitable">合适</span><br>· ${friendSuitable.join('<br>· ')}</p>
-        <p style="margin-top:10px;"><span class="label unsuitable">不合适</span><br>· ${friendUnsuitable.join('<br>· ')}</p>
+        <p><span class="label suitable">合适</span><br>${friendSuitable}</p>
+        <p style="margin-top:10px;"><span class="label unsuitable">不合适</span><br>${friendUnsuitable}</p>
       </div>
     `;
     document.getElementById('match-sections').innerHTML = sectionsHTML;
