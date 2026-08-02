@@ -131,6 +131,7 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvet
 
 <script>
 (function(){
+  // ========== 完整 240 题 ==========
   const raw = `我经常做白日梦，想象各种可能性。|O|幻想|0
 我喜欢沉浸在幻想和想象中。|O|幻想|0
 我很少做白日梦。|O|幻想|1
@@ -387,7 +388,13 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvet
   function show(id){['page-start','page-test','page-result'].forEach(x=>document.getElementById(x).classList.add('hidden'));document.getElementById(id).classList.remove('hidden');window.scrollTo(0,0);}
 
   window.startTest = function(){show('page-test');currentPage=0;answers=new Array(questions.length).fill(null);render();};
-  window.resumeTest = function(){const sv=localStorage.getItem(SK);if(!sv)return;const d=JSON.parse(sv);answers=d.a;currentPage=d.c||0;show('page-test');render();};
+  window.resumeTest = function(){
+    const sv=localStorage.getItem(SK);if(!sv)return;
+    const d=JSON.parse(sv);
+    answers=d.a;currentPage=d.c||0;
+    if(answers.every(v=>v!==null)){showResult();return;}
+    show('page-test');render();
+  };
 
   function save(){localStorage.setItem(SK,JSON.stringify({a:answers,c:currentPage,t:Date.now()}));}
   function render(){
@@ -523,18 +530,18 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvet
     const sectionsHTML = `
       <div class="match-section">
         <h4>💑 理想伴侣</h4>
-        <p><span class="label suitable">合适</span>${partnerSuitable.join('<br>· ')}</p>
-        <p style="margin-top:10px;"><span class="label unsuitable">不合适</span>${partnerUnsuitable.join('<br>· ')}</p>
+        <p><span class="label suitable">合适</span><br>· ${partnerSuitable.join('<br>· ')}</p>
+        <p style="margin-top:10px;"><span class="label unsuitable">不合适</span><br>· ${partnerUnsuitable.join('<br>· ')}</p>
       </div>
       <div class="match-section">
         <h4>🤝 最佳搭档 / 同事</h4>
-        <p><span class="label suitable">合适</span>${colleagueSuitable.join('<br>· ')}</p>
-        <p style="margin-top:10px;"><span class="label unsuitable">不合适</span>${colleagueUnsuitable.join('<br>· ')}</p>
+        <p><span class="label suitable">合适</span><br>· ${colleagueSuitable.join('<br>· ')}</p>
+        <p style="margin-top:10px;"><span class="label unsuitable">不合适</span><br>· ${colleagueUnsuitable.join('<br>· ')}</p>
       </div>
       <div class="match-section">
         <h4>🎉 知己好友</h4>
-        <p><span class="label suitable">合适</span>${friendSuitable.join('<br>· ')}</p>
-        <p style="margin-top:10px;"><span class="label unsuitable">不合适</span>${friendUnsuitable.join('<br>· ')}</p>
+        <p><span class="label suitable">合适</span><br>· ${friendSuitable.join('<br>· ')}</p>
+        <p style="margin-top:10px;"><span class="label unsuitable">不合适</span><br>· ${friendUnsuitable.join('<br>· ')}</p>
       </div>
     `;
     document.getElementById('match-sections').innerHTML = sectionsHTML;
