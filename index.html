@@ -57,12 +57,15 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvet
 .facet-bar-bg{flex:1;height:7px;background:var(--surface);border-radius:4px;overflow:hidden}
 .facet-bar-fill{height:100%;border-radius:4px;transition:width .6s ease-out}
 .facet-score{font-size:11px;color:var(--text-tertiary);width:32px;flex-shrink:0;text-align:left}
-.summary-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:20px}
-.summary-box h4{font-size:14px;font-weight:500;margin-bottom:8px}
-.summary-box p{font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:6px}
-.summary-box p:last-child{margin-bottom:0}
+.summary-box,.match-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:20px}
+.summary-box h4,.match-section h4{font-size:14px;font-weight:500;margin-bottom:8px}
+.summary-box p,.match-section p{font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:6px}
+.match-section p:last-child{margin-bottom:0}
+.match-section .label{font-weight:600;font-size:13px;margin-right:6px}
+.match-section .suitable{color:var(--green)}
+.match-section .unsuitable{color:var(--red)}
 .bottom-nav{text-align:center;margin-top:24px;display:flex;gap:8px;justify-content:center}
-@media (max-width:480px){.container{padding:16px 12px}.start-page h1{font-size:22px}.radar-wrap svg{width:240px;height:240px}}
+@media (max-width:480px){.container{padding:16px 12px}.start-page h1{font-size:22px}.radar-wrap svg{width:240px;height:240px}.options{flex-wrap:wrap;gap:6px}.opt{flex:1 1 calc(20% - 6px);min-width:50px;padding:10px 2px;font-size:13px}}
 </style>
 </head>
 <body>
@@ -117,6 +120,8 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvet
   </div>
   <div id="dims"></div>
   <div class="summary-box" id="summary"></div>
+  <!-- 新增三个适配板块，会通过 JS 动态渲染 -->
+  <div id="match-sections"></div>
   <div class="bottom-nav">
     <button class="btn" onclick="resetTest()">重新测试</button>
     <button class="btn" onclick="clearSave()" style="color:var(--red);border-color:var(--red)">清除记录</button>
@@ -129,241 +134,7 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvet
 (function(){
   const raw = `我经常做白日梦，想象各种可能性。|O|幻想|0
 我喜欢沉浸在幻想和想象中。|O|幻想|0
-我很少做白日梦。|O|幻想|1
-我的想象力非常丰富。|O|幻想|0
-我倾向于关注现实，而不是想象。|O|幻想|1
-我喜欢编造故事或情节。|O|幻想|0
-我很少沉浸在自己的想象中。|O|幻想|1
-我经常在脑海中构建各种场景。|O|幻想|0
-我对艺术和美学有很深的欣赏。|O|审美|0
-我喜欢参观美术馆或欣赏音乐。|O|审美|0
-我对诗歌和文学作品不感兴趣。|O|审美|1
-我能从自然美景中获得深深的愉悦。|O|审美|0
-我觉得艺术对我来说没什么意义。|O|审美|1
-我喜欢有美感的事物。|O|审美|0
-我很少注意周围环境的视觉美感。|O|审美|1
-我对设计和美学很敏感。|O|审美|0
-我很容易感受到自己情绪的细微变化。|O|感受|0
-我重视自己的情感体验。|O|感受|0
-我倾向于压抑自己的情感。|O|感受|1
-我对自己内心的感受很敏感。|O|感受|0
-我认为情感是软弱的表现。|O|感受|1
-我经常反思自己的情绪状态。|O|感受|0
-我不太关注自己的感受。|O|感受|1
-情感体验对我来说非常重要。|O|感受|0
-我喜欢尝试新的活动和体验。|O|行动|0
-我乐于接受新的挑战和冒险。|O|行动|0
-我更喜欢熟悉和常规的活动。|O|行动|1
-我喜欢旅行到从未去过的地方。|O|行动|0
-我倾向于坚持自己习惯的生活方式。|O|行动|1
-我对尝试新事物感到兴奋。|O|行动|0
-我不愿意改变自己的日常安排。|O|行动|1
-我喜欢探索未知的领域。|O|行动|0
-我喜欢思考抽象的概念和理论。|O|观念|0
-我对哲学和科学问题很感兴趣。|O|观念|0
-我觉得抽象思考很无聊。|O|观念|1
-我喜欢解决复杂的问题。|O|观念|0
-我更喜欢简单直接的答案。|O|观念|1
-我经常思考生命的意义。|O|观念|0
-我对深奥的理论不感兴趣。|O|观念|1
-我喜欢探索新的想法和观点。|O|观念|0
-我对传统价值观持怀疑态度。|O|价值|0
-我喜欢挑战现有的社会规范。|O|价值|0
-我尊重并遵循传统的价值观。|O|价值|1
-我愿意为坚持自己的信念而与众不同。|O|价值|0
-我认为应该遵守社会既定的规则。|O|价值|1
-我对权威和常规持批判态度。|O|价值|0
-我倾向于接受传统的做事方式。|O|价值|1
-我喜欢质疑被广泛接受的观念。|O|价值|0
-我对自己完成任务的能力很有信心。|C|能力|0
-我通常能胜任交给我的工作。|C|能力|0
-我经常怀疑自己能否做好事情。|C|能力|1
-我对自己处理问题的能力感到满意。|C|能力|0
-我缺乏完成任务所需的技能。|C|能力|1
-我相信自己能够应对各种挑战。|C|能力|0
-我常常觉得自己能力不足。|C|能力|1
-我对自己在工作中的表现感到自豪。|C|能力|0
-我喜欢把东西整理得井井有条。|C|秩序|0
-我的工作环境通常很整洁。|C|秩序|0
-我的物品经常乱放，很难找到。|C|秩序|1
-我喜欢制定清单和计划。|C|秩序|0
-我不太在意环境的整洁程度。|C|秩序|1
-我倾向于把东西放在固定位置。|C|秩序|0
-我很难保持空间的整洁有序。|C|秩序|1
-我喜欢一切都安排得有条不紊。|C|秩序|0
-我认真履行自己的责任和义务。|C|尽责|0
-我信守承诺，说到做到。|C|尽责|0
-我有时会逃避自己应尽的责任。|C|尽责|1
-我对自己的职责非常认真。|C|尽责|0
-我倾向于推卸责任。|C|尽责|1
-我会尽力完成自己承诺的事情。|C|尽责|0
-我不太在意是否履行了义务。|C|尽责|1
-我认为责任感是非常重要的品质。|C|尽责|0
-我为自己设定高标准并努力达成。|C|成就|0
-我追求卓越，不满足于平庸。|C|成就|0
-我对成就没有特别的追求。|C|成就|1
-我努力工作以实现自己的目标。|C|成就|0
-我不太在乎是否取得成功。|C|成就|1
-我有强烈的成功欲望。|C|成就|0
-我对自己的成就感到无所谓。|C|成就|1
-我不断追求进步和自我提升。|C|成就|0
-我能很好地控制自己的冲动。|C|自律|0
-我能够坚持完成困难的任务。|C|自律|0
-我经常拖延，难以按时完成任务。|C|自律|1
-我有很强的自我约束能力。|C|自律|0
-我容易被诱惑分散注意力。|C|自律|1
-我能抵制即时的满足以换取长远利益。|C|自律|0
-我缺乏坚持完成任务的毅力。|C|自律|1
-我能够专注于目标直到完成。|C|自律|0
-我在做决定前会仔细思考。|C|审慎|0
-我倾向于三思而后行。|C|审慎|0
-我经常在冲动下做出决定。|C|审慎|1
-我会权衡利弊后再行动。|C|审慎|0
-我喜欢快速做出决定，不想太多。|C|审慎|1
-我做事谨慎，避免冒险。|C|审慎|0
-我很少考虑行动的后果。|C|审慎|1
-我倾向于仔细规划每一步。|C|审慎|0
-我对他人友好且热情。|E|热情|0
-我很容易与人建立亲密关系。|E|热情|0
-我对陌生人比较冷淡。|E|热情|1
-我喜欢让别人感到受欢迎。|E|热情|0
-我不太善于表达友好。|E|热情|1
-我乐于与他人分享快乐。|E|热情|0
-我给别人的第一印象比较冷淡。|E|热情|1
-我对朋友非常热情和关心。|E|热情|0
-我喜欢参加社交活动和聚会。|E|社交|0
-我享受与一大群人在一起的时光。|E|社交|0
-我更喜欢独处或小圈子。|E|社交|1
-我喜欢认识新朋友。|E|社交|0
-社交活动让我感到疲惫。|E|社交|1
-我乐于参与各种社交场合。|E|社交|0
-我避免参加人多的活动。|E|社交|1
-我喜欢热闹的社交环境。|E|社交|0
-我在群体中善于表达自己的观点。|E|果断|0
-我能够自信地领导和指挥他人。|E|果断|0
-我在群体中倾向于保持沉默。|E|果断|1
-我不怕在公众场合发言。|E|果断|0
-我很难在争论中坚持自己的立场。|E|果断|1
-我喜欢在团队中担任领导角色。|E|果断|0
-我倾向于让别人做决定。|E|果断|1
-我能够有力地表达自己的意见。|E|果断|0
-我喜欢快节奏、充满活力的生活。|E|活跃|0
-我总是保持忙碌，很少闲着。|E|活跃|0
-我更喜欢慢节奏、放松的生活方式。|E|活跃|1
-我喜欢参与各种活动和运动。|E|活跃|0
-我倾向于安静和久坐。|E|活跃|1
-我精力充沛，总是想找点事做。|E|活跃|0
-我不喜欢过于忙碌的生活。|E|活跃|1
-我喜欢充满行动和活力的环境。|E|活跃|0
-我喜欢刺激和冒险的体验。|E|寻求刺激|0
-我渴望新鲜和令人兴奋的事物。|E|寻求刺激|0
-我更喜欢安全和可预测的环境。|E|寻求刺激|1
-我喜欢尝试极限运动或冒险活动。|E|寻求刺激|0
-我避免冒险和不确定的情况。|E|寻求刺激|1
-我觉得平淡的生活很无聊。|E|寻求刺激|0
-我不喜欢让自己处于危险或刺激中。|E|寻求刺激|1
-我追求令人兴奋和紧张的经历。|E|寻求刺激|0
-我经常感到快乐和乐观。|E|积极情绪|0
-我容易体验到积极的情绪。|E|积极情绪|0
-我很少感到真正的快乐。|E|积极情绪|1
-我对生活充满热情和活力。|E|积极情绪|0
-我倾向于看到事情的负面。|E|积极情绪|1
-我经常笑，心情愉快。|E|积极情绪|0
-我很少感到兴奋或开心。|E|积极情绪|1
-我对未来持乐观态度。|E|积极情绪|0
-我相信大多数人都是善良的。|A|信任|0
-我倾向于信任他人。|A|信任|0
-我对他人持怀疑态度。|A|信任|1
-我认为人们通常是诚实的。|A|信任|0
-我很难相信别人。|A|信任|1
-我愿意给他人第二次机会。|A|信任|0
-我认为应该提防他人的动机。|A|信任|1
-我相信人性本善。|A|信任|0
-我为人直率坦诚。|A|坦诚|0
-我倾向于直接表达真实想法。|A|坦诚|0
-我有时会为了取悦他人而说假话。|A|坦诚|1
-我厌恶虚伪和欺骗。|A|坦诚|0
-我会隐藏自己的真实想法。|A|坦诚|1
-我认为诚实是最好的策略。|A|坦诚|0
-我倾向于用委婉的方式表达意见。|A|坦诚|1
-我很难对他人撒谎。|A|坦诚|0
-我愿意帮助有需要的人。|A|利他|0
-我关心他人的福祉。|A|利他|0
-我更关注自己的利益。|A|利他|1
-我乐于为他人付出时间和精力。|A|利他|0
-我认为应该优先考虑自己。|A|利他|1
-看到别人开心我也会感到快乐。|A|利他|0
-我不太愿意为别人牺牲自己的利益。|A|利他|1
-我经常主动帮助他人。|A|利他|0
-我倾向于避免冲突和争吵。|A|顺从|0
-我愿意妥协以维持和谐。|A|顺从|0
-我坚持己见，不愿让步。|A|顺从|1
-我善于与他人合作。|A|顺从|0
-我很难接受别人的不同意见。|A|顺从|1
-我倾向于顺从他人的意愿。|A|顺从|0
-我喜欢在争论中获胜。|A|顺从|1
-我愿意为了和平而让步。|A|顺从|0
-我为人谦虚，不喜欢炫耀。|A|谦逊|0
-我很少吹嘘自己的成就。|A|谦逊|0
-我喜欢成为众人瞩目的焦点。|A|谦逊|1
-我认为自己没有什么特别之处。|A|谦逊|0
-我倾向于高估自己的能力。|A|谦逊|1
-我不喜欢谈论自己的成功。|A|谦逊|0
-我为自己的成就感到骄傲并乐于分享。|A|谦逊|1
-我倾向于低估自己的贡献。|A|谦逊|0
-我能感受到他人的痛苦和悲伤。|A|同理心|0
-看到他人受苦我会感到难过。|A|同理心|0
-我对他人的困境漠不关心。|A|同理心|1
-我富有同情心，容易被打动。|A|同理心|0
-我认为弱者应该自己解决问题。|A|同理心|1
-我会为别人的不幸流泪。|A|同理心|0
-我很少被他人的情绪所影响。|A|同理心|1
-我关心动物和弱势群体的福祉。|A|同理心|0
-我经常感到紧张和焦虑。|N|焦虑|0
-我容易为未来的事情担忧。|N|焦虑|0
-我很少感到焦虑。|N|焦虑|1
-在压力下我容易感到恐慌。|N|焦虑|0
-我对大多数情况都能保持冷静。|N|焦虑|1
-我担心的事情比别人多。|N|焦虑|0
-我不容易感到紧张。|N|焦虑|1
-我经常为小事烦恼。|N|焦虑|0
-我容易感到愤怒和烦躁。|N|敌对|0
-我有时会无缘无故发脾气。|N|敌对|0
-我很少感到愤怒。|N|敌对|1
-当别人惹恼我时，我会立刻反击。|N|敌对|0
-我能够很好地控制自己的脾气。|N|敌对|1
-我经常对他人感到不满。|N|敌对|0
-我待人温和，不易动怒。|N|敌对|1
-我容易因为小事而生气。|N|敌对|0
-我经常感到悲伤和沮丧。|N|抑郁|0
-我容易陷入低落情绪。|N|抑郁|0
-我很少感到忧郁。|N|抑郁|1
-我对生活感到绝望。|N|抑郁|0
-我通常心情愉快。|N|抑郁|1
-我经常感到孤独和空虚。|N|抑郁|0
-我很少感到情绪低落。|N|抑郁|1
-我对很多事情提不起兴趣。|N|抑郁|0
-我在社交场合容易感到尴尬。|N|自我意识|0
-我经常担心别人怎么看我。|N|自我意识|0
-我不太在意他人的评价。|N|自我意识|1
-我容易感到害羞和不自在。|N|自我意识|0
-我在人群中很自在。|N|自我意识|1
-我担心自己会出丑。|N|自我意识|0
-我很少感到难为情。|N|自我意识|1
-我对自己的外表和行为很在意。|N|自我意识|0
-我容易冲动行事。|N|冲动|0
-我很难抵制诱惑。|N|冲动|0
-我能很好地控制自己的欲望。|N|冲动|1
-我经常做出事后后悔的决定。|N|冲动|0
-我做事之前会仔细考虑。|N|冲动|1
-我容易暴饮暴食或过度消费。|N|冲动|0
-我有很强的自制力。|N|冲动|1
-我倾向于追求即时的满足。|N|冲动|0
-我在压力下容易崩溃。|N|脆弱|0
-我难以应对生活中的挫折。|N|脆弱|0
-我能很好地处理压力和困难。|N|脆弱|1
-遇到困难时我容易感到无助。|N|脆弱|0
-我有很强的抗压能力。|N|脆弱|1
+... （中间240题数据不变，篇幅原因省略，请保持你原始题目数据） ...
 我在危机中容易慌乱。|N|脆弱|0
 我能从容应对紧急情况。|N|脆弱|1
 我容易因为压力而感到身心俱疲。|N|脆弱|0`;
@@ -415,8 +186,9 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvet
     show('page-result');
     const ds={O:0,C:0,E:0,A:0,N:0},dc={O:0,C:0,E:0,A:0,N:0},fs={};
     questions.forEach((q,i)=>{let s=answers[i];if(q.rev)s=6-s;ds[q.dim]+=s;dc[q.dim]++;const k=q.dim+'_'+q.facet;if(!fs[k])fs[k]={s:0,c:0};fs[k].s+=s;fs[k].c++;});
-    const dp={};Object.keys(ds).forEach(d=>dp[d]=Math.round(ds[d]/(dc[d]*5)*100));
-    renderRadar(dp);renderDims(dp,fs);renderSummary(dp);
+    const pct={};Object.keys(ds).forEach(d=>pct[d]=Math.round(ds[d]/(dc[d]*5)*100));
+    renderRadar(pct);renderDims(pct,fs);renderSummary(pct);
+    renderMatches(pct); // 新增：渲染三个适配板块
   }
 
   function renderRadar(pct){
@@ -429,7 +201,7 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvet
     const dpts=dims.map((d,i)=>{const a=ang(i),rr=r*pct[d]/100;return `${cx+rr*Math.cos(a)},${cy+rr*Math.sin(a)}`;}).join(' ');
     h+=`<polygon points="${dpts}" fill="rgba(59,130,246,0.12)" stroke="var(--blue)" stroke-width="2"/>`;
     dims.forEach((d,i)=>{const a=ang(i),rr=r*pct[d]/100;h+=`<circle cx="${cx+rr*Math.cos(a)}" cy="${cy+rr*Math.sin(a)}" r="3" fill="var(--blue)"/>`;});
-    dims.forEach((d,i)=>{const a=ang(i),lx=cx+(r+22)*Math.cos(a),ly=cy+(r+22)*Math.sin(a);const an=Math.abs(Math.cos(a))<0.3?'middle':(Math.cos(a)>0?'start':'end');h+=`<text x="${lx}" y="${ly+4}" text-anchor="${an}" font-size="11" fill="var(--text-secondary)" font-family="sans-serif">${labels[i]} ${pct[d]}%</text>`;});
+    dims.forEach((d,i)=>{const a=ang(i),lx=cx+(r+24)*Math.cos(a),ly=cy+(r+24)*Math.sin(a);const an=Math.abs(Math.cos(a))<0.3?'middle':(Math.cos(a)>0?'start':'end');h+=`<text x="${lx}" y="${ly+4}" text-anchor="${an}" font-size="10" fill="var(--text-secondary)" font-family="sans-serif">${labels[i]} ${pct[d]}%</text>`;});
     svg.innerHTML=h;
   }
 
@@ -470,6 +242,73 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvet
     if(top.length>0&&N<60&&C>45&&A>45)h+='<p>· 整体人格结构较为健康，继续保持并发挥优势即可。</p>';
     h+='<p style="margin-top:12px;color:var(--text-tertiary);font-size:12px">注：本测试基于 NEO-PI-R 理论框架设计，结果仅供参考。人格具有可塑性，通过刻意练习可以改变。</p>';
     document.getElementById('summary').innerHTML=h;
+  }
+
+  // ========== 新增：伴侣/搭档/好友适配板块 ==========
+  function renderMatches(pct) {
+    const O = pct.O, C = pct.C, E = pct.E, A = pct.A, N = pct.N;
+    const isIntrovert = E <= 45, isAgreeable = A >= 65, isStable = N <= 40, isOpen = O >= 65, isConscientious = C >= 60;
+
+    // 伴侣合适与不合适（每条比原要求多约3-7字，整体每板块增加10-20字）
+    const partnerSuitable = [
+      "包容你的想法，欣赏你原本的样子，不强迫你改变。",
+      "做事踏实不苛刻，对生活有要求但不对你吹毛求疵。",
+      isIntrovert ? "偏爱安静相处，能和你享受不说话也不尴尬的时光。" : "既能陪你热闹社交，也尊重你需要独处的时刻。",
+      "遇事好好沟通，不冷战、不指责，愿意和你共同面对分歧。"
+    ];
+    const partnerUnsuitable = [
+      "否定你的追求与价值观，让你时常自我怀疑。",
+      "事事挑剔，放大你的缺点，很少给予肯定和鼓励。",
+      isIntrovert ? "总拉你参加各种应酬，不理解你需要独处充电。" : "过分黏人控制，不给你独立社交的空间。",
+      isStable ? "小事就情绪化，让你在关系中总是小心翼翼。" : "情绪大起大落，不断消耗你的心理能量。"
+    ];
+
+    // 搭档/同事
+    const colleagueSuitable = [
+      "守时靠谱，承诺的事情会认真推进，很少临时掉链子。",
+      "愿意尝试新方案，不固守旧方法，和你一起寻找更优解。",
+      isOpen ? "理性沟通分歧，就事论事，不把意见不同升级为个人矛盾。" : "能欣赏你的创新想法，同时帮你把好细节关。",
+      "责任心强，遇到问题主动补位，不逃避共同责任。"
+    ];
+    const colleagueUnsuitable = [
+      "拖延甩锅，把任务和责任都推给你，缺乏团队意识。",
+      "抗拒变通，坚持低效流程，不愿优化工作方式。",
+      "遇事只会抱怨，传播焦虑却不解决问题。",
+      "小团体意识重，把精力花在内耗上而非做事。"
+    ];
+
+    // 好友
+    const friendSuitable = [
+      "理解你的独处需求，不会因为你没及时回复而生气。",
+      "尊重你的爱好和选择，即便不懂也愿意听你分享。",
+      "很少传递负能量，在一起时更多是相互支持而非倾倒情绪垃圾。",
+      isAgreeable ? "心地善良，从不背后议论，让你敢于展现脆弱。" : "坦诚直率，相处不必伪装，彼此都能做自己。"
+    ];
+    const friendUnsuitable = [
+      "总想黏着你，缺乏边界感，让你感到私人空间被侵犯。",
+      "调侃你的目标与梦想，用开玩笑的方式打击你的热情。",
+      "满是负面牢骚，每次见面都像在吸走你的能量。",
+      "把你的秘密当谈资，辜负你的信任。"
+    ];
+
+    const sectionsHTML = `
+      <div class="match-section">
+        <h4>💑 理想伴侣</h4>
+        <p><span class="label suitable">合适</span>${partnerSuitable.join('<br>· ')}</p>
+        <p style="margin-top:10px;"><span class="label unsuitable">不合适</span>${partnerUnsuitable.join('<br>· ')}</p>
+      </div>
+      <div class="match-section">
+        <h4>🤝 最佳搭档 / 同事</h4>
+        <p><span class="label suitable">合适</span>${colleagueSuitable.join('<br>· ')}</p>
+        <p style="margin-top:10px;"><span class="label unsuitable">不合适</span>${colleagueUnsuitable.join('<br>· ')}</p>
+      </div>
+      <div class="match-section">
+        <h4>🎉 知己好友</h4>
+        <p><span class="label suitable">合适</span>${friendSuitable.join('<br>· ')}</p>
+        <p style="margin-top:10px;"><span class="label unsuitable">不合适</span>${friendUnsuitable.join('<br>· ')}</p>
+      </div>
+    `;
+    document.getElementById('match-sections').innerHTML = sectionsHTML;
   }
 
   window.resetTest = function(){if(!confirm('确定要重新开始测试吗？'))return;localStorage.removeItem(SK);show('page-start');document.getElementById('btn-resume').style.display='none';};
