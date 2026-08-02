@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NEO-PI-R 大五人格测试</title>
+<meta name="description" content="基于 NEO-PI-R 标准量表的 240 题大五人格测试">
+<style>
+:root{--bg:#ffffff;--text:#1a1a1a;--text-secondary:#666666;--text-tertiary:#999999;--border:#e5e5e5;--surface:#f5f5f5;--accent:#1a1a1a;--blue:#3b82f6;--green:#22c55e;--purple:#a855f7;--red:#ef4444;--gray:#6b7280}
+@media (prefers-color-scheme: dark){:root{--bg:#0a0a0a;--text:#f0f0f0;--text-secondary:#a0a0a0;--text-tertiary:#666666;--border:#2a2a2a;--surface:#1a1a1a;--accent:#f0f0f0}}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-tap-highlight-color:transparent}
+.container{max-width:640px;margin:0 auto;padding:20px 16px}
+.hidden{display:none!important}
+.page{animation:fadeIn .3s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.start-page{text-align:center;padding:40px 8px}
+.start-page h1{font-size:26px;font-weight:600;margin-bottom:8px;letter-spacing:-0.5px}
+.start-page .subtitle{font-size:15px;color:var(--text-secondary);margin-bottom:6px}
+.start-page .meta{font-size:13px;color:var(--text-tertiary);margin-bottom:24px}
+.start-page .tags{margin-bottom:28px}
+.start-page .tag{display:inline-block;padding:4px 12px;border-radius:6px;font-size:13px;margin:3px;background:var(--surface);color:var(--text-secondary);border:1px solid var(--border)}
+.start-page .hint-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:28px;text-align:left}
+.start-page .hint-box p{font-size:13px;color:var(--text-secondary);line-height:1.8;margin-bottom:6px}
+.start-page .hint-box p:last-child{margin-bottom:0}
+.start-page .hint-box .hint-title{font-size:14px;font-weight:500;color:var(--text);margin-bottom:8px}
+.btn{display:inline-block;padding:12px 32px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text);font-size:15px;cursor:pointer;transition:all .15s;text-decoration:none}
+.btn:hover{background:var(--surface)}
+.btn-primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.btn-primary:hover{opacity:.9;background:var(--accent)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.progress-wrap{height:5px;background:var(--surface);border-radius:3px;margin-bottom:12px;overflow:hidden}
+.progress-bar{height:100%;background:var(--accent);border-radius:3px;transition:width .4s ease-out}
+.progress-text{font-size:12px;color:var(--text-tertiary);text-align:center;margin-bottom:16px}
+.test-header{font-size:17px;font-weight:500;margin-bottom:3px}
+.test-sub{font-size:13px;color:var(--text-secondary);margin-bottom:16px}
+.question{padding:14px 0;border-bottom:1px solid var(--border)}
+.question:last-child{border-bottom:none}
+.q-text{font-size:15px;color:var(--text);line-height:1.6;margin-bottom:10px}
+.options{display:flex;gap:4px}
+.opt{flex:1;padding:9px 2px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text-secondary);font-size:12px;cursor:pointer;transition:all .15s;text-align:center;line-height:1.3}
+.opt:hover{border-color:var(--text);color:var(--text);background:var(--surface)}
+.opt.selected{border-color:var(--accent);background:var(--accent);color:var(--bg)}
+.nav-bar{display:flex;justify-content:space-between;margin-top:18px;align-items:center}
+.page-num{font-size:12px;color:var(--text-tertiary)}
+.hint-footer{font-size:11px;color:var(--text-tertiary);text-align:center;margin-top:10px}
+.result-header{text-align:center;margin-bottom:24px}
+.result-header h2{font-size:20px;font-weight:600;margin-bottom:4px}
+.result-header p{font-size:13px;color:var(--text-secondary)}
+.radar-wrap{display:flex;justify-content:center;margin-bottom:28px}
+.radar-wrap svg{width:280px;height:280px}
+.dim-section{margin-bottom:24px}
+.dim-title{font-size:15px;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.dim-dot{width:8px;height:8px;border-radius:50%}
+.facet-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.facet-name{font-size:12px;color:var(--text-secondary);width:56px;flex-shrink:0;text-align:right}
+.facet-bar-bg{flex:1;height:7px;background:var(--surface);border-radius:4px;overflow:hidden}
+.facet-bar-fill{height:100%;border-radius:4px;transition:width .6s ease-out}
+.facet-score{font-size:11px;color:var(--text-tertiary);width:32px;flex-shrink:0;text-align:left}
+.summary-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:20px}
+.summary-box h4{font-size:14px;font-weight:500;margin-bottom:8px}
+.summary-box p{font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:6px}
+.summary-box p:last-child{margin-bottom:0}
+.bottom-nav{text-align:center;margin-top:24px;display:flex;gap:8px;justify-content:center}
+@media (max-width:480px){.container{padding:16px 12px}.start-page h1{font-size:22px}.radar-wrap svg{width:240px;height:240px}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div id="page-start" class="page">
+  <div class="start-page">
+    <h1>NEO-PI-R 大五人格测试</h1>
+    <p class="subtitle">基于 NEO-PI-R 标准量表 · 240 题 · 约 25–35 分钟</p>
+    <p class="meta">5 大维度 × 6 个子维度 × 8 题</p>
+    <div class="tags">
+      <span class="tag">开放性 O</span>
+      <span class="tag">尽责性 C</span>
+      <span class="tag">外向性 E</span>
+      <span class="tag">宜人性 A</span>
+      <span class="tag">神经质 N</span>
+    </div>
+    <div class="hint-box">
+      <p class="hint-title">测试前请确认</p>
+      <p>· 全程约 25–35 分钟，请在安静、不被打扰的环境中一次性完成</p>
+      <p>· 进度会自动保存，但请尽量避免中途离开，保持作答的连贯性</p>
+      <p>· 请根据你的真实感受作答，不要过度思考或选择"理想自我"</p>
+      <p>· 没有标准答案，第一反应往往最准确</p>
+    </div>
+    <button class="btn btn-primary" onclick="startTest()">开始测试</button>
+    <br><br>
+    <button class="btn" onclick="resumeTest()" id="btn-resume" style="display:none">继续上次测试</button>
+  </div>
+</div>
+
+<div id="page-test" class="page hidden">
+  <div class="progress-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+  <div class="progress-text" id="progress-text">0 / 240</div>
+  <div class="test-header">请阅读以下陈述</div>
+  <div class="test-sub">选择最符合你实际情况的选项</div>
+  <div id="questions"></div>
+  <div class="nav-bar">
+    <button class="btn" id="btn-prev" onclick="prevPage()" disabled>上一页</button>
+    <span class="page-num" id="page-num">第 1 / 24 页</span>
+    <button class="btn btn-primary" id="btn-next" onclick="nextPage()">下一页</button>
+  </div>
+  <div class="hint-footer">请根据真实感受作答，进度已自动保存</div>
+</div>
+
+<div id="page-result" class="page hidden">
+  <div class="result-header">
+    <h2>你的大五人格全景报告</h2>
+    <p>基于 NEO-PI-R 240 题标准量表</p>
+  </div>
+  <div class="radar-wrap">
+    <svg viewBox="0 0 280 280" id="radar-svg"></svg>
+  </div>
+  <div id="dims"></div>
+  <div class="summary-box" id="summary"></div>
+  <div class="bottom-nav">
+    <button class="btn" onclick="resetTest()">重新测试</button>
+    <button class="btn" onclick="clearSave()" style="color:var(--red);border-color:var(--red)">清除记录</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+(function(){
+  const raw = `我经常做白日梦，想象各种可能性。|O|幻想|0
+我喜欢沉浸在幻想和想象中。|O|幻想|0
+我很少做白日梦。|O|幻想|1
+我的想象力非常丰富。|O|幻想|0
+我倾向于关注现实，而不是想象。|O|幻想|1
+我喜欢编造故事或情节。|O|幻想|0
+我很少沉浸在自己的想象中。|O|幻想|1
+我经常在脑海中构建各种场景。|O|幻想|0
+我对艺术和美学有很深的欣赏。|O|审美|0
+我喜欢参观美术馆或欣赏音乐。|O|审美|0
+我对诗歌和文学作品不感兴趣。|O|审美|1
+我能从自然美景中获得深深的愉悦。|O|审美|0
+我觉得艺术对我来说没什么意义。|O|审美|1
+我喜欢有美感的事物。|O|审美|0
+我很少注意周围环境的视觉美感。|O|审美|1
+我对设计和美学很敏感。|O|审美|0
+我很容易感受到自己情绪的细微变化。|O|感受|0
+我重视自己的情感体验。|O|感受|0
+我倾向于压抑自己的情感。|O|感受|1
+我对自己内心的感受很敏感。|O|感受|0
+我认为情感是软弱的表现。|O|感受|1
+我经常反思自己的情绪状态。|O|感受|0
+我不太关注自己的感受。|O|感受|1
+情感体验对我来说非常重要。|O|感受|0
+我喜欢尝试新的活动和体验。|O|行动|0
+我乐于接受新的挑战和冒险。|O|行动|0
+我更喜欢熟悉和常规的活动。|O|行动|1
+我喜欢旅行到从未去过的地方。|O|行动|0
+我倾向于坚持自己习惯的生活方式。|O|行动|1
+我对尝试新事物感到兴奋。|O|行动|0
+我不愿意改变自己的日常安排。|O|行动|1
+我喜欢探索未知的领域。|O|行动|0
+我喜欢思考抽象的概念和理论。|O|观念|0
+我对哲学和科学问题很感兴趣。|O|观念|0
+我觉得抽象思考很无聊。|O|观念|1
+我喜欢解决复杂的问题。|O|观念|0
+我更喜欢简单直接的答案。|O|观念|1
+我经常思考生命的意义。|O|观念|0
+我对深奥的理论不感兴趣。|O|观念|1
+我喜欢探索新的想法和观点。|O|观念|0
+我对传统价值观持怀疑态度。|O|价值|0
+我喜欢挑战现有的社会规范。|O|价值|0
+我尊重并遵循传统的价值观。|O|价值|1
+我愿意为坚持自己的信念而与众不同。|O|价值|0
+我认为应该遵守社会既定的规则。|O|价值|1
+我对权威和常规持批判态度。|O|价值|0
+我倾向于接受传统的做事方式。|O|价值|1
+我喜欢质疑被广泛接受的观念。|O|价值|0
+我对自己完成任务的能力很有信心。|C|能力|0
+我通常能胜任交给我的工作。|C|能力|0
+我经常怀疑自己能否做好事情。|C|能力|1
+我对自己处理问题的能力感到满意。|C|能力|0
+我缺乏完成任务所需的技能。|C|能力|1
+我相信自己能够应对各种挑战。|C|能力|0
+我常常觉得自己能力不足。|C|能力|1
+我对自己在工作中的表现感到自豪。|C|能力|0
+我喜欢把东西整理得井井有条。|C|秩序|0
+我的工作环境通常很整洁。|C|秩序|0
+我的物品经常乱放，很难找到。|C|秩序|1
+我喜欢制定清单和计划。|C|秩序|0
+我不太在意环境的整洁程度。|C|秩序|1
+我倾向于把东西放在固定位置。|C|秩序|0
+我很难保持空间的整洁有序。|C|秩序|1
+我喜欢一切都安排得有条不紊。|C|秩序|0
+我认真履行自己的责任和义务。|C|尽责|0
+我信守承诺，说到做到。|C|尽责|0
+我有时会逃避自己应尽的责任。|C|尽责|1
+我对自己的职责非常认真。|C|尽责|0
+我倾向于推卸责任。|C|尽责|1
+我会尽力完成自己承诺的事情。|C|尽责|0
+我不太在意是否履行了义务。|C|尽责|1
+我认为责任感是非常重要的品质。|C|尽责|0
+我为自己设定高标准并努力达成。|C|成就|0
+我追求卓越，不满足于平庸。|C|成就|0
+我对成就没有特别的追求。|C|成就|1
+我努力工作以实现自己的目标。|C|成就|0
+我不太在乎是否取得成功。|C|成就|1
+我有强烈的成功欲望。|C|成就|0
+我对自己的成就感到无所谓。|C|成就|1
+我不断追求进步和自我提升。|C|成就|0
+我能很好地控制自己的冲动。|C|自律|0
+我能够坚持完成困难的任务。|C|自律|0
+我经常拖延，难以按时完成任务。|C|自律|1
+我有很强的自我约束能力。|C|自律|0
+我容易被诱惑分散注意力。|C|自律|1
+我能抵制即时的满足以换取长远利益。|C|自律|0
+我缺乏坚持完成任务的毅力。|C|自律|1
+我能够专注于目标直到完成。|C|自律|0
+我在做决定前会仔细思考。|C|审慎|0
+我倾向于三思而后行。|C|审慎|0
+我经常在冲动下做出决定。|C|审慎|1
+我会权衡利弊后再行动。|C|审慎|0
+我喜欢快速做出决定，不想太多。|C|审慎|1
+我做事谨慎，避免冒险。|C|审慎|0
+我很少考虑行动的后果。|C|审慎|1
+我倾向于仔细规划每一步。|C|审慎|0
+我对他人友好且热情。|E|热情|0
+我很容易与人建立亲密关系。|E|热情|0
+我对陌生人比较冷淡。|E|热情|1
+我喜欢让别人感到受欢迎。|E|热情|0
+我不太善于表达友好。|E|热情|1
+我乐于与他人分享快乐。|E|热情|0
+我给别人的第一印象比较冷淡。|E|热情|1
+我对朋友非常热情和关心。|E|热情|0
+我喜欢参加社交活动和聚会。|E|社交|0
+我享受与一大群人在一起的时光。|E|社交|0
+我更喜欢独处或小圈子。|E|社交|1
+我喜欢认识新朋友。|E|社交|0
+社交活动让我感到疲惫。|E|社交|1
+我乐于参与各种社交场合。|E|社交|0
+我避免参加人多的活动。|E|社交|1
+我喜欢热闹的社交环境。|E|社交|0
+我在群体中善于表达自己的观点。|E|果断|0
+我能够自信地领导和指挥他人。|E|果断|0
+我在群体中倾向于保持沉默。|E|果断|1
+我不怕在公众场合发言。|E|果断|0
+我很难在争论中坚持自己的立场。|E|果断|1
+我喜欢在团队中担任领导角色。|E|果断|0
+我倾向于让别人做决定。|E|果断|1
+我能够有力地表达自己的意见。|E|果断|0
+我喜欢快节奏、充满活力的生活。|E|活跃|0
+我总是保持忙碌，很少闲着。|E|活跃|0
+我更喜欢慢节奏、放松的生活方式。|E|活跃|1
+我喜欢参与各种活动和运动。|E|活跃|0
+我倾向于安静和久坐。|E|活跃|1
+我精力充沛，总是想找点事做。|E|活跃|0
+我不喜欢过于忙碌的生活。|E|活跃|1
+我喜欢充满行动和活力的环境。|E|活跃|0
+我喜欢刺激和冒险的体验。|E|寻求刺激|0
+我渴望新鲜和令人兴奋的事物。|E|寻求刺激|0
+我更喜欢安全和可预测的环境。|E|寻求刺激|1
+我喜欢尝试极限运动或冒险活动。|E|寻求刺激|0
+我避免冒险和不确定的情况。|E|寻求刺激|1
+我觉得平淡的生活很无聊。|E|寻求刺激|0
+我不喜欢让自己处于危险或刺激中。|E|寻求刺激|1
+我追求令人兴奋和紧张的经历。|E|寻求刺激|0
+我经常感到快乐和乐观。|E|积极情绪|0
+我容易体验到积极的情绪。|E|积极情绪|0
+我很少感到真正的快乐。|E|积极情绪|1
+我对生活充满热情和活力。|E|积极情绪|0
+我倾向于看到事情的负面。|E|积极情绪|1
+我经常笑，心情愉快。|E|积极情绪|0
+我很少感到兴奋或开心。|E|积极情绪|1
+我对未来持乐观态度。|E|积极情绪|0
+我相信大多数人都是善良的。|A|信任|0
+我倾向于信任他人。|A|信任|0
+我对他人持怀疑态度。|A|信任|1
+我认为人们通常是诚实的。|A|信任|0
+我很难相信别人。|A|信任|1
+我愿意给他人第二次机会。|A|信任|0
+我认为应该提防他人的动机。|A|信任|1
+我相信人性本善。|A|信任|0
+我为人直率坦诚。|A|坦诚|0
+我倾向于直接表达真实想法。|A|坦诚|0
+我有时会为了取悦他人而说假话。|A|坦诚|1
+我厌恶虚伪和欺骗。|A|坦诚|0
+我会隐藏自己的真实想法。|A|坦诚|1
+我认为诚实是最好的策略。|A|坦诚|0
+我倾向于用委婉的方式表达意见。|A|坦诚|1
+我很难对他人撒谎。|A|坦诚|0
+我愿意帮助有需要的人。|A|利他|0
+我关心他人的福祉。|A|利他|0
+我更关注自己的利益。|A|利他|1
+我乐于为他人付出时间和精力。|A|利他|0
+我认为应该优先考虑自己。|A|利他|1
+看到别人开心我也会感到快乐。|A|利他|0
+我不太愿意为别人牺牲自己的利益。|A|利他|1
+我经常主动帮助他人。|A|利他|0
+我倾向于避免冲突和争吵。|A|顺从|0
+我愿意妥协以维持和谐。|A|顺从|0
+我坚持己见，不愿让步。|A|顺从|1
+我善于与他人合作。|A|顺从|0
+我很难接受别人的不同意见。|A|顺从|1
+我倾向于顺从他人的意愿。|A|顺从|0
+我喜欢在争论中获胜。|A|顺从|1
+我愿意为了和平而让步。|A|顺从|0
+我为人谦虚，不喜欢炫耀。|A|谦逊|0
+我很少吹嘘自己的成就。|A|谦逊|0
+我喜欢成为众人瞩目的焦点。|A|谦逊|1
+我认为自己没有什么特别之处。|A|谦逊|0
+我倾向于高估自己的能力。|A|谦逊|1
+我不喜欢谈论自己的成功。|A|谦逊|0
+我为自己的成就感到骄傲并乐于分享。|A|谦逊|1
+我倾向于低估自己的贡献。|A|谦逊|0
+我能感受到他人的痛苦和悲伤。|A|同理心|0
+看到他人受苦我会感到难过。|A|同理心|0
+我对他人的困境漠不关心。|A|同理心|1
+我富有同情心，容易被打动。|A|同理心|0
+我认为弱者应该自己解决问题。|A|同理心|1
+我会为别人的不幸流泪。|A|同理心|0
+我很少被他人的情绪所影响。|A|同理心|1
+我关心动物和弱势群体的福祉。|A|同理心|0
+我经常感到紧张和焦虑。|N|焦虑|0
+我容易为未来的事情担忧。|N|焦虑|0
+我很少感到焦虑。|N|焦虑|1
+在压力下我容易感到恐慌。|N|焦虑|0
+我对大多数情况都能保持冷静。|N|焦虑|1
+我担心的事情比别人多。|N|焦虑|0
+我不容易感到紧张。|N|焦虑|1
+我经常为小事烦恼。|N|焦虑|0
+我容易感到愤怒和烦躁。|N|敌对|0
+我有时会无缘无故发脾气。|N|敌对|0
+我很少感到愤怒。|N|敌对|1
+当别人惹恼我时，我会立刻反击。|N|敌对|0
+我能够很好地控制自己的脾气。|N|敌对|1
+我经常对他人感到不满。|N|敌对|0
+我待人温和，不易动怒。|N|敌对|1
+我容易因为小事而生气。|N|敌对|0
+我经常感到悲伤和沮丧。|N|抑郁|0
+我容易陷入低落情绪。|N|抑郁|0
+我很少感到忧郁。|N|抑郁|1
+我对生活感到绝望。|N|抑郁|0
+我通常心情愉快。|N|抑郁|1
+我经常感到孤独和空虚。|N|抑郁|0
+我很少感到情绪低落。|N|抑郁|1
+我对很多事情提不起兴趣。|N|抑郁|0
+我在社交场合容易感到尴尬。|N|自我意识|0
+我经常担心别人怎么看我。|N|自我意识|0
+我不太在意他人的评价。|N|自我意识|1
+我容易感到害羞和不自在。|N|自我意识|0
+我在人群中很自在。|N|自我意识|1
+我担心自己会出丑。|N|自我意识|0
+我很少感到难为情。|N|自我意识|1
+我对自己的外表和行为很在意。|N|自我意识|0
+我容易冲动行事。|N|冲动|0
+我很难抵制诱惑。|N|冲动|0
+我能很好地控制自己的欲望。|N|冲动|1
+我经常做出事后后悔的决定。|N|冲动|0
+我做事之前会仔细考虑。|N|冲动|1
+我容易暴饮暴食或过度消费。|N|冲动|0
+我有很强的自制力。|N|冲动|1
+我倾向于追求即时的满足。|N|冲动|0
+我在压力下容易崩溃。|N|脆弱|0
+我难以应对生活中的挫折。|N|脆弱|0
+我能很好地处理压力和困难。|N|脆弱|1
+遇到困难时我容易感到无助。|N|脆弱|0
+我有很强的抗压能力。|N|脆弱|1
+我在危机中容易慌乱。|N|脆弱|0
+我能从容应对紧急情况。|N|脆弱|1
+我容易因为压力而感到身心俱疲。|N|脆弱|0`;
+
+  const questions = raw.split("\n").map((line,i)=>{const p=line.split("|");return{idx:i,text:p[0],dim:p[1],facet:p[2],rev:p[3]==="1"};});
+  const perPage = 10, totalPages = Math.ceil(questions.length/perPage);
+  const SK = 'neo_pir_v1';
+  let answers = new Array(questions.length).fill(null);
+  let currentPage = 0;
+  const DL = {O:"开放性",C:"尽责性",E:"外向性",A:"宜人性",N:"神经质"};
+  const DC = {O:"var(--blue)",C:"var(--green)",E:"var(--purple)",A:"var(--red)",N:"var(--gray)"};
+  const FO = {O:["幻想","审美","感受","行动","观念","价值"],C:["能力","秩序","尽责","成就","自律","审慎"],E:["热情","社交","果断","活跃","寻求刺激","积极情绪"],A:["信任","坦诚","利他","顺从","谦逊","同理心"],N:["焦虑","敌对","抑郁","自我意识","冲动","脆弱"]};
+
+  const sv = localStorage.getItem(SK);
+  if(sv){try{const d=JSON.parse(sv);if(d.a&&d.a.length===questions.length)document.getElementById('btn-resume').style.display='inline-block';}catch(e){}}
+
+  function show(id){['page-start','page-test','page-result'].forEach(x=>document.getElementById(x).classList.add('hidden'));document.getElementById(id).classList.remove('hidden');window.scrollTo(0,0);}
+
+  window.startTest = function(){show('page-test');currentPage=0;answers=new Array(questions.length).fill(null);render();};
+  window.resumeTest = function(){const sv=localStorage.getItem(SK);if(!sv)return;const d=JSON.parse(sv);answers=d.a;currentPage=d.c||0;show('page-test');render();};
+
+  function save(){localStorage.setItem(SK,JSON.stringify({a:answers,c:currentPage,t:Date.now()}));}
+  function render(){
+    const c=document.getElementById('questions');c.innerHTML='';
+    const s=currentPage*perPage,e=Math.min(s+perPage,questions.length);
+    for(let i=s;i<e;i++){
+      const q=questions[i];
+      const d=document.createElement('div');d.className='question';
+      d.innerHTML=`<div class="q-text">${i+1}. ${q.text}</div><div class="options" data-i="${i}">${[1,2,3,4,5].map(v=>`<button class="opt${answers[i]===v?' selected':''}" onclick="select(${i},${v})">${['非常不同意','不同意','中立','同意','非常同意'][v-1]}</button>`).join('')}</div>`;
+      c.appendChild(d);
+    }
+    updateProg();
+    document.getElementById('btn-prev').disabled=currentPage===0;
+    document.getElementById('btn-next').textContent=currentPage===totalPages-1?'查看结果':'下一页';
+    document.getElementById('page-num').textContent=`第 ${currentPage+1} / ${totalPages} 页`;
+    save();
+  }
+  window.select = function(i,v){answers[i]=v;document.querySelectorAll(`.options[data-i="${i}"] .opt`).forEach((b,j)=>b.classList.toggle('selected',j+1===v));updateProg();save();};
+  window.nextPage = function(){
+    const s=currentPage*perPage,e=Math.min(s+perPage,questions.length);
+    let u=[];for(let i=s;i<e;i++)if(answers[i]===null)u.push(i-s+1);
+    if(u.length>0){alert('第 '+u.join(', ')+' 题尚未回答');return;}
+    if(currentPage<totalPages-1){currentPage++;render();}else{showResult();}
+  };
+  window.prevPage = function(){if(currentPage>0){currentPage--;render();}};
+  function updateProg(){const a=answers.filter(x=>x!==null).length;document.getElementById('progress-bar').style.width=(a/questions.length*100)+'%';document.getElementById('progress-text').textContent=`${a} / ${questions.length}`;}
+
+  function showResult(){
+    show('page-result');
+    const ds={O:0,C:0,E:0,A:0,N:0},dc={O:0,C:0,E:0,A:0,N:0},fs={};
+    questions.forEach((q,i)=>{let s=answers[i];if(q.rev)s=6-s;ds[q.dim]+=s;dc[q.dim]++;const k=q.dim+'_'+q.facet;if(!fs[k])fs[k]={s:0,c:0};fs[k].s+=s;fs[k].c++;});
+    const dp={};Object.keys(ds).forEach(d=>dp[d]=Math.round(ds[d]/(dc[d]*5)*100));
+    renderRadar(dp);renderDims(dp,fs);renderSummary(dp);
+  }
+
+  function renderRadar(pct){
+    const svg=document.getElementById('radar-svg'),dims=['O','C','E','A','N'],labels=['开放性','尽责性','外向性','宜人性','神经质'];
+    const cx=140,cy=140,r=100;
+    const ang=i=>-Math.PI/2+i*2*Math.PI/5;
+    let h='';
+    for(let lv=1;lv<=5;lv++){const pts=dims.map((_,i)=>{const a=ang(i),rr=r*lv/5;return `${cx+rr*Math.cos(a)},${cy+rr*Math.sin(a)}`;}).join(' ');h+=`<polygon points="${pts}" fill="none" stroke="var(--border)" stroke-width="0.5"/>`;}
+    dims.forEach((_,i)=>{const a=ang(i);h+=`<line x1="${cx}" y1="${cy}" x2="${cx+r*Math.cos(a)}" y2="${cy+r*Math.sin(a)}" stroke="var(--border)" stroke-width="0.5"/>`;});
+    const dpts=dims.map((d,i)=>{const a=ang(i),rr=r*pct[d]/100;return `${cx+rr*Math.cos(a)},${cy+rr*Math.sin(a)}`;}).join(' ');
+    h+=`<polygon points="${dpts}" fill="rgba(59,130,246,0.12)" stroke="var(--blue)" stroke-width="2"/>`;
+    dims.forEach((d,i)=>{const a=ang(i),rr=r*pct[d]/100;h+=`<circle cx="${cx+rr*Math.cos(a)}" cy="${cy+rr*Math.sin(a)}" r="3" fill="var(--blue)"/>`;});
+    dims.forEach((d,i)=>{const a=ang(i),lx=cx+(r+22)*Math.cos(a),ly=cy+(r+22)*Math.sin(a);const an=Math.abs(Math.cos(a))<0.3?'middle':(Math.cos(a)>0?'start':'end');h+=`<text x="${lx}" y="${ly+4}" text-anchor="${an}" font-size="11" fill="var(--text-secondary)" font-family="sans-serif">${labels[i]} ${pct[d]}%</text>`;});
+    svg.innerHTML=h;
+  }
+
+  function renderDims(dp,fs){
+    const c=document.getElementById('dims');c.innerHTML='';
+    const dims=['O','C','E','A','N'];
+    dims.forEach(dim=>{
+      const sec=document.createElement('div');sec.className='dim-section';
+      let fh='';
+      FO[dim].forEach(facet=>{
+        const k=dim+'_'+facet,f=fs[k],fp=Math.round(f.s/(f.c*5)*100);
+        fh+=`<div class="facet-row"><div class="facet-name">${facet}</div><div class="facet-bar-bg"><div class="facet-bar-fill" style="width:0%;background:${DC[dim]}" data-t="${fp}"></div></div><div class="facet-score">${fp}%</div></div>`;
+      });
+      sec.innerHTML=`<div class="dim-title"><span class="dim-dot" style="background:${DC[dim]}"></span>${DL[dim]} · ${dp[dim]}%</div>${fh}`;
+      c.appendChild(sec);
+    });
+    setTimeout(()=>document.querySelectorAll('.facet-bar-fill').forEach(b=>b.style.width=b.dataset.t+'%'),200);
+  }
+
+  function renderSummary(pct){
+    const O=pct.O,C=pct.C,E=pct.E,A=pct.A,N=pct.N;
+    let top=[],low=[];
+    if(O>=65)top.push('富有想象力和创造力');if(O<=40)low.push('务实保守');
+    if(C>=65)top.push('自律且做事靠谱');if(C<=40)low.push('随性自由');
+    if(E>=65)top.push('外向热情');if(E<=40)low.push('内向深思');
+    if(A>=65)top.push('善解人意');if(A<=40)low.push('直率独立');
+    if(N<=40)top.push('情绪稳定');if(N>=65)low.push('情绪敏感');
+    let h='<h4>你的核心特质</h4>';
+    if(top.length>0)h+=`<p><strong>突出优势：</strong>${top.join('、')}</p>`;
+    if(low.length>0)h+=`<p><strong>相对短板：</strong>${low.join('、')}</p>`;
+    if(top.length===0&&low.length===0)h+='<p>你在各维度上表现均衡，没有特别突出的倾向。</p>';
+    h+='<h4 style="margin-top:14px">发展建议</h4>';
+    if(N>=60)h+='<p>· 情绪敏感度较高，建议学习正念或认知行为技巧来管理焦虑。</p>';
+    if(C<=45)h+='<p>· 自律性有提升空间，建议从小目标开始建立习惯系统。</p>';
+    if(A<=45)h+='<p>· 人际交往中较为直接，学习共情技巧有助于改善关系。</p>';
+    if(E<=40)h+='<p>· 偏内向，不必强迫自己社交，但适度拓展会带来新机会。</p>';
+    if(O<=40)h+='<p>· 偏好稳定，偶尔尝试新事物可能带来意外收获。</p>';
+    if(top.length>0&&N<60&&C>45&&A>45)h+='<p>· 整体人格结构较为健康，继续保持并发挥优势即可。</p>';
+    h+='<p style="margin-top:12px;color:var(--text-tertiary);font-size:12px">注：本测试基于 NEO-PI-R 理论框架设计，结果仅供参考。人格具有可塑性，通过刻意练习可以改变。</p>';
+    document.getElementById('summary').innerHTML=h;
+  }
+
+  window.resetTest = function(){if(!confirm('确定要重新开始测试吗？'))return;localStorage.removeItem(SK);show('page-start');document.getElementById('btn-resume').style.display='none';};
+  window.clearSave = function(){if(!confirm('确定要清除所有保存的测试记录吗？'))return;localStorage.removeItem(SK);alert('记录已清除');show('page-start');document.getElementById('btn-resume').style.display='none';};
+})();
+</script>
+</body>
+</html>
